@@ -22,7 +22,7 @@ post '/visit' do
  @barber=params[:barber]
  @color=params[:color]
 
-  # хеш
+  # хеш для вывода ошибок
  hh = { :username => 'Enter your name',
         :phone => 'Enter your phone',
         :datetime => 'Enter date and time' }
