@@ -4,8 +4,8 @@ require 'sinatra/reloader'
 require 'sqlite3'
 
 configure do 
-       @db = SQLite3::Database.new 'barbershop.db'
-       @db.execute 'CREATE TABLE IF NOT EXISTS "Users"
+       db = SQLite3::Database.new 'barbershop.db'
+       db.execute 'CREATE TABLE IF NOT EXISTS "Users"
         (
          "id" INTEGER PRIMARY KEY AUTOINCREMENT,
          "user_name" TEXT, 
@@ -14,6 +14,10 @@ configure do
          "barber" TEXT, 
          "color" TEXT
         )'
+end
+
+def get_db
+       return SQLite3::Database.new 'barbershop.db'
 end
 
 get '/' do
@@ -30,29 +34,33 @@ get '/visit' do
 end
 
 post '/visit' do
- @user_name=params[:username]
- @phone=params[:phone]
- @date_time=params[:datetime]
- @barber=params[:barber]
- @color=params[:color]
+  @user_name=params[:username]
+  @phone=params[:phone]
+  @datetime=params[:datetime]
+  @barber=params[:barber]
+  @color=params[:color]
 
   # хеш для вывода ошибок
- hh = { :username => 'Enter your name',
+  hh = { :username => 'Enter your name',
         :phone => 'Enter your phone',
         :datetime => 'Enter date and time' }
- @error = hh.select{|key,_| params[key] == ""}.values.join (", ")
+  @error = hh.select{|key,_| params[key] == ""}.values.join (", ")
  
- if @error != ''
+  if @error != ''
  	return erb :visit
- end
+  end
+  
+  db=get_db
+  db.execute 'insert into Users (user_name, phone, datestamp, barber, color)
+       values ( ?,?,?,?,?)', [@user_name, @phone, @datetime, @barber, @color]
 
  @title = 'Thank you!'
  @message = "Dear #{@user_name}, we'll be waiting for you at #{@date_time} "
 
- f=File.open 'users.txt', 'a'
- f.write "User: #{@user_name}, Phone: #{@phone}, Date and time: #{@date_time}, Color: #{@color} Barber: #{@barber}\n"
- f.close
- erb :message
+  f=File.open 'users.txt', 'a'
+  f.write "User: #{@user_name}, Phone: #{@phone}, Date and time: #{@datetime}, Color: #{@color} Barber: #{@barber}\n"
+  f.close
+  erb :message
 end
 
 get '/contacts' do
