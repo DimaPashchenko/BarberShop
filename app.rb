@@ -80,16 +80,17 @@ post '/visit' do
   end
   
   db=get_db
-  db.execute 'insert into Users (user_name, phone, datestamp, barber, color)
+  db.execute 'insert into Users
+                            (
+                                user_name, 
+                                 phone,
+                                 datestamp,
+                                 barber,
+                                 color
+                            )
        values ( ?,?,?,?,?)', [@user_name, @phone, @datetime, @barber, @color]
 
- @title = 'Thank you!'
- @message = "Dear #{@user_name}, we'll be waiting for you at #{@date_time} "
-
-  f=File.open 'users.txt', 'a'
-  f.write "User: #{@user_name}, Phone: #{@phone}, Date and time: #{@datetime}, Color: #{@color} Barber: #{@barber}\n"
-  f.close
-  erb :message
+   erb "<h2>Спасибо, вы записались!</h2>"
 end
 
 get '/contacts' do
